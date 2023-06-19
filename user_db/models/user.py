@@ -1,16 +1,14 @@
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String, create_engine
-
-engine = create_engine('postgresql://yudzhum:charbox@localhost:5432/fastapitest')
-
-
-Base = declarative_base()
+from user_db.db import BaseDBModel
 
 
-class User(Base):
+#engine = create_engine('postgresql://yudzhum:charbox@localhost:5432/fastapitest')
+
+
+class User(BaseDBModel):
     __tablename__ = 'users'
 
-    id = Column(Integer, primary_key=True)
-    name = Column(String(64))
-    group = Column(String(64))
-    password = Column(String(128))
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(String(64), nullable=False, unique=True)
+    group = Column(String(64), nullable=False)
+    password = Column(String(128), nullable=False)
