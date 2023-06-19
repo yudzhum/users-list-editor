@@ -11,7 +11,7 @@ async def get_users():
         SELECT * FROM users
     """
     async with get_connection() as conn:
-        users = await conn.fetch()
+        return await conn.fetch(query)
 
 
 @router.post('/users/')
