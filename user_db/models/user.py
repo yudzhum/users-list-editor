@@ -11,4 +11,5 @@ class User(BaseDBModel):
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(64), nullable=False, unique=True)
     group = Column(String(64), nullable=False)
-    password = Column(String(128), nullable=False)
+    password_hash = Column(String(128), nullable=False)
+    salt = Column(String(128), nullable=False, unique=True)
