@@ -52,7 +52,7 @@ async def close():
 
 
 @asynccontextmanager
-async def get_connection() -> AsyncIterator[asyncpg.Connection]:
+async def get_connection() -> AsyncIterator[asyncpg.connection.Connection]:
     conn_pool = await connect()
     conn = await conn_pool.acquire()
     yield conn

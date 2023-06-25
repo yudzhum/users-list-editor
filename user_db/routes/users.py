@@ -1,23 +1,21 @@
+from ast import List
 from fastapi import APIRouter
 
-from .schemas.user import UserCreateOrUpdate
+from user_db.lib.hash import generate_password_hash
+
+from .schemas.user import UserCreateOrUpdate, UserOut
 from user_db.db import get_connection
 
 router = APIRouter()
 
-@router.get('/users/')
+@router.get('/users/', response_model=List[UserOut])
 async def get_users():
     query = """
         SELECT * FROM users
     """
     async with get_connection() as conn:
         users = await conn.fetch(query)
-        # place for serializer, shoud be function
-        return map(lambda user: ({
-            'id': user['id'],
-            'name': user['name'],
-            'group': user['group'],
-        }), users)
+        return [UserOut(**user) for user in users]
 
 
 @router.post('/users/')
@@ -26,11 +24,12 @@ async def create_user(args: UserCreateOrUpdate):
         INSERT INTO users(name, password_hash, salt, "group")
         VALUES ($1, $2, $3)
     """
+    password_hash = generate_password_hash(args.password)
     async with get_connection() as conn:
         return await conn.fetch(
             query,
             args.name,
-            args.password,
+            password_hash,
             args.group
         )
 
@@ -41,12 +40,13 @@ async def edit_user(user_id: int, args: UserCreateOrUpdate):
         UPDATE users SET name=$2, password_hash=$3, "group"=$4
         WHERE users.id = $1
     """
+    password_hash = generate_password_hash(args.password)
     async with get_connection() as conn:
         return await conn.fetch(
             query,
             user_id,
             args.name,
-            args.password,
+            password_hash,
             args.group
         )
 
